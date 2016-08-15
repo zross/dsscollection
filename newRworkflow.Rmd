@@ -1,40 +1,71 @@
+
 # Pure, predictable, pipeable: A new data processing workflow for R
 
-# Introduction
+## Introduction
 
-## R background, most people rely on base, merge, aggregate, etc. Packages tended to be focused on functionality that didn't exist in R rather than new workflow. 
+Just five years ago the basic data manipulation steps in the vast majority of world's R scripts relied on a standard workflow made up of common base functions that have existed in the R language since it was first developed (as S 40 years ago?) [reference??]. You might have a sequence of steps that moved sequentially through `read.csv`, `merge`, `aggregate`, `sort`, `subset`, `plot` (or perhaps `xyplot`) and then repeat. New packages for the first 5-10 years in R focused more broadly on adding functionality [is this true?] rather than altering key data manipulation workflows.
 
-## Packages started to focus on alternative workflow. `plyr` 2008 first version. `data.table` was 2006. Also `doBy`, `reshape2` etc. 
+The consistency in workflows makes it easy to share code and to re-use code written many years prior. Other advantages include:
 
-## Most recently the `dplyr`, `tidyr`, `magrittr` have taken off (?) when? Evidence of adoption of new approaches. `broom`, `purr`
-
-[This URL has list of pure, predictable pipeable R packages](https://docs.google.com/spreadsheets/d/1xHKTQC1Htrfz4kvhiD4m6YVtzM73RSpcTt3yxB7gtQg/edit#gid=0)
+At the same time, the base R functions in R suffer from limitations related to speed, predictability and consistency [help with this?]. As a result, R users developed packages to tackle specific limitations of base code.
 
 
-Hadley asks why this one when there are so many workflows you could build.
+### Alternatives to key data manipulation workflow
 
-(Hadley) Should we worry about R diverging into mutually incomprehensible dialects?
+ `plyr` 2008 first version. `data.table` was 2006. Also `doBy`, `reshape2` etc provide alternatives to key data manipulation packages. [Zev editorializing The uptake is hard to gauge but my sense is that people used these in dribs and drabs but few adopted them as a complete alternative to the base function]. [Is the following true: They were designed to replace specific functions and limitations but were not broad enough to replace entire workflows. Instead users adopted pieces but otherwise continued to use base. Not sure if this applies to `data.table` and I'm not sure how much `data.table` was adopted].
 
-Bache says [Eric Raymond’s 17 Unix Rules](https://en.m.wikipedia.org/wiki/Unix_philosophy)
+ A more ambitious effort to replace the traditional `base` workflows began with `dplyr`. [Again, `data.table` is an abitious effort to replace workflows and is great, but I'm not sure it was widely adopted. I, myself, used it for a while but I (A) often forgot the syntax and (B) the syntax is so different that when I shared scripts the user on the receiving end might have a hard time figuring out what I was doing.]
 
+### Most recently the `dplyr`, `tidyr`, `magrittr` have taken off (?) when? Evidence of adoption of new approaches. `broom`, `purr`
 
-# Pure, predictable
+[Zev editorializing: my sense is this is the first time that an entirely new workflow has replaced the base functions for data manipulation purposes and has been adopted reasonably swiftly].
 
-## Some discussion of what benefits `dplyr`, `tidyr` etc provide. What makes functions pure and predictable? 
-
-In David's notes he
-* Pure- constraint of no side effects to make good building blocks in a chain
-* Predictable- constraints on naming and on expected inputs and outputs (e.g. broom always returns a data frame)
-
-David (Last note is that the dialect aims to get rid of syntax operators that aren't %>% in favor of guessable, Google-able verbs. For example, reducing appearances of [], [[]], and $.)
+There are key reasons why this new workflow has been adopted compared to others. Pure, predictable, pipeable are the main reasons. Bache says to review [Eric Raymond’s 17 Unix Rules](https://en.m.wikipedia.org/wiki/Unix_philosophy) for additional discussion. [Zev editorializing: I personally think it also has a lot to do with Hadley's reach on social media and extensive outreach through talks etc not to mention creating useful documentation. These are strong components of the adoption in my opinion. With respect to predictable I think this is part of the reason why `data.table` has not taken off the way it should -- it's very hard to remember the syntax etc.]
 
 
-# Pipeable
+### Pure, predictable, pipeable (note that for these notes I copied Hadley verbatim)
+
+#### Pure
+
+"each function is easy to understand in isolation" (hadley). output only depends on input, makes no changes to state of world. You would use pure functions because easier to read and understand them in isolation, trivial to parallelise, trivial to moise (cache). There are times when you can't make it pure. The case study hadley uses is fortify lm. David's notes say Pure- constraint of no side effects to make good building blocks in a chain
+
+#### Predictable
+
+"once you've understood one you've understood them all" (hadley). Learn once apply many times, don't need to memorise special cases easier to teach. Examples would include being consistent with puncutation, function names (verb vs noun, plurary singular), argument names and order, object types. Hadley gives example of read and write CSV where the first argument should be file in both. In David's notes Predictable- constraints on naming and on expected inputs and outputs (e.g. broom always returns a data frame). David (Last note is that the dialect aims to get rid of syntax operators that aren't %>% in favor of guessable, Google-able verbs. For example, reducing appearances of [], [[]], and $.)
+
+#### Pipeable
+
+combine simple pieces with a standard tool. Predictable across packages not just within, learn once and apply in many situations. Data should be first argument. Use NSE judiciously, better to use one-sided formulas instead. 
 
 Pipes have been around in R since (the beginning?). What's new and interesting about `magrittr`, why has it been adopted more broadly beyond being included in `dplyr`. David explains the real power of the `%>%` operator as "constrained grammars for manipulation". David references [Hadley's write up on data transformation](http://r4ds.had.co.nz/transform.html)
 
 * Pipeable- constraint of data argument first (David)
 
+* Hadley gives example of "turns function composition (hard to read) into sequence (easy to read)"
 
-# An example
+### Example
 
+[see Zev blog unless someone, very soon, wants to use alternative data](http://zevross.com/blog/2015/01/13/a-new-data-processing-workflow-for-r-dplyr-magrittr-tidyr-ggplot2/)
+
+
+### Conclusion
+
+#### A new, pure, predictable pipeable workflow
+
+#### Concerns
+
+(Hadley) Should we worry about R diverging into mutually incomprehensible dialects?  [Other concerns]
+
+
+
+## References
+
+Hadley talk
+
+[NYT, data analysts captivated by R's power](http://www.nytimes.com/2009/01/07/technology/business-computing/07program.html?pagewanted=all&_r=0)
+
+[R You Ready for R, this is response to initial article](http://bits.blogs.nytimes.com/2009/01/08/r-you-ready-for-r/)
+
+NYT article says there is a history of R at end of "Software for Data Analysis: Programming with R" by Chambers
+
+[This URL has list of pure, predictable pipeable R packages](https://docs.google.com/spreadsheets/d/1xHKTQC1Htrfz4kvhiD4m6YVtzM73RSpcTt3yxB7gtQg/edit#gid=0)

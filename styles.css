@@ -1,0 +1,67 @@
+
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+body{
+	font-family: 'Open Sans', sans-serif;
+}
+
+h1, h2{
+padding: 15px 0px;
+margin: 15px 0px;
+border-bottom: thin dotted;
+}
+
+.mylogo{
+	width:250px;
+	margin-top: 20px;
+
+}
+
+/*h1::before{
+	content:url('logo_etched_blue.png');
+	margin-right: 30px;
+}
+*/
+h1, h2, h3 {
+font-weight: bold;
+    margin-bottom: 20px;
+}
+
+h2 {
+margin-top: 50px;
+}
+
+.section {
+margin-bottom: 30px;
+}
+
+
+pre:not([class]) {
+background-color: whiteSmoke;
+}
+
+h2:before{
+color: #0A2D6D;
+padding-right: 0.3em;
+margin-left: 0;
+content: "///";
+}
+
+.blah{
+  color: red;
+}
+
+.caption{
+font-weight: bold;
+    font-style: italic;
+    /*color: #08488A;*/
+    font-size: 110%;
+}
+
+p{
+	margin-bottom: 20px;
+}
+
+li{
+	margin-bottom: 10px;
+}

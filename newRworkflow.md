@@ -1,25 +1,6 @@
----
-title: "Rough Outline: Pure, predictable, pipeable: A new data processing workflow for R"
-output:
-  html_document:
-    css: styles.css
-    highlight: pygments
-    keep_md: yes
-    toc: yes
-  pdf_document:
-    highlight: pygments
-    toc: yes
----
+# Rough Outline: Pure, predictable, pipeable: A new data processing workflow for R
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-library(knitr)
-options(width=100)
-options(scipen=9999)
-opts_chunk$set(echo=FALSE)
-opts_chunk$set(message=FALSE)
-opts_chunk$set(warning=FALSE)
-opts_chunk$set(cache=FALSE)
-```
+
 
 
 ## Introduction
@@ -28,15 +9,29 @@ Just five years ago the basic data manipulation steps in the vast majority of wo
 
 A typical example of the base workflow might look something like:
 
-```{r, fig.width=4, fig.height=4, echo = TRUE}
+
+```r
 dat <- read.csv("data/toy.csv")
 dat[1:4,]
+```
+
+```
+##   ID var
+## 1  a  13
+## 2  a   8
+## 3  a  16
+## 4  b   3
+```
+
+```r
 avg <- aggregate(var~ID, data = dat, FUN = mean)
 names(avg)[2] <- "avgVar"
 dat <- merge(dat, avg, by = "ID")
 dat <- dat[rev(order(dat$avgVar)),]
 plot(dat$var, dat$avgVar)
 ```
+
+![](newRworkflow_files/figure-html/unnamed-chunk-2-1.png)
 
 
 The consistency in workflows makes it easy to share code and to re-use code written many years prior. Other advantages include [help needed]
@@ -91,23 +86,27 @@ The package dplyr has several great functions to connect directly to external da
 If you would rather skip the step of extracting data from Google, I've placed the full dataset on GitHub. If you want to follow along exactly as you see below you will need an account with Google and I put details on how to do this below. 
 
 
-```{r}
-library(dplyr)
-library(bigrquery)
-#library(httpuv) #did not have to install manually at work
-#sql<-"select * from [publicdata:samples.shakespeare]"
-#shakespeare <-query_exec(sql, project = "dark-mark-818",max_pages=Inf)
-#write.csv(shakespeare, "D:/Dropbox/work/blogposts/dplyr_tidyr_magrittr/shakespeare.csv")
-shakespeare<-read.csv("data/shakespeare.csv", as.is=T)
-shakespeare<-select(shakespeare, -X)
 
-```
 
 When you run the query_exec() function you will be asked if you ant to cache your Google authorization credentials. Choose "Yes" by typing "1". Your browser will open and you will need to click the "Accept" button after which the query will be processed. In my case, this took 34.7 seconds.
 
-```{r}
-head(shakespeare)
-str(shakespeare)
+
+```
+##        word word_count          corpus corpus_date
+## 1      hive          1 loverscomplaint        1609
+## 2 plaintful          1 loverscomplaint        1609
+## 3       Are          1 loverscomplaint        1609
+## 4      Than          1 loverscomplaint        1609
+## 5  attended          1 loverscomplaint        1609
+## 6      That          7 loverscomplaint        1609
+```
+
+```
+## 'data.frame':	164656 obs. of  4 variables:
+##  $ word       : chr  "hive" "plaintful" "Are" "Than" ...
+##  $ word_count : int  1 1 1 1 1 7 1 1 1 1 ...
+##  $ corpus     : chr  "loverscomplaint" "loverscomplaint" "loverscomplaint" "loverscomplaint" ...
+##  $ corpus_date: int  1609 1609 1609 1609 1609 1609 1609 1609 1609 1609 ...
 ```
 
 
@@ -117,32 +116,37 @@ You can see that this is a relatively simple table.Now we have the data we're re
 
 It turns out that there are multiple instances of words due to differences in case (lower, upper and proper case) and this gives us a very un-sexy introduction to the use of dplyr. Let's take a quick look using one word:
 
-```{r}
-head(filter(shakespeare, tolower(word)=="henry"))
+
+```
+##    word word_count        corpus corpus_date
+## 1 HENRY        122 kinghenryviii        1612
+## 2 Henry          7 kinghenryviii        1612
+## 3 HENRY        113  3kinghenryvi        1590
+## 4 Henry         63  3kinghenryvi        1590
+## 5 HENRY          1 rapeoflucrece        1609
+## 6 HENRY        122 kingrichardii        1595
 ```
 
 Here we use the filter verb to extract records and, yes, we need to do something about the repeated words. We will aggregate by lower case word, corpus and corpus date, summing all the instances of the word.
 
-```{r}
 
-shakespeare<-mutate(shakespeare, word=tolower(word))
-grp<-group_by(shakespeare, word, corpus, corpus_date)
-shakespeare<-summarize(grp, word_count=sum(word_count))
-head(filter(shakespeare, tolower(word)=="henry"))
-
+```
+## Source: local data frame [6 x 4]
+## Groups: word, corpus [6]
+## 
+##    word       corpus corpus_date word_count
+##   <chr>        <chr>       <int>      <int>
+## 1 henry 1kinghenryiv        1597        255
+## 2 henry 1kinghenryvi        1590        103
+## 3 henry 2kinghenryiv        1598        133
+## 4 henry 2kinghenryvi        1590        162
+## 5 henry 3kinghenryvi        1590        176
+## 6 henry   kinghenryv        1599        194
 ```
 
 Better. Now let's use dplyr here to take a quick look at what the most and least popular words are by computing the total times each word occurs across all of Shakespeare's works. We will use dplyr at its most basic to start, grouping by word, summing occurrences (total), counting the numer of Shakespeare works they occur in (count) and arranging by total occurrences (in descending order).
 
-```{r eval=FALSE}
 
-grp <- group_by(shakespeare, word)
-cnts <- summarize(grp, count=n(), total = sum(word_count))
-word.count <- arrange(cnts, desc(total))
-
-head(word.count)
-
-```
 
 
 OK, this worked like a charm and, in my opinion, cleaner than using base functions (getting variable names right with aggregate, for example, is a pain) but there are a lot of unnecessary keystrokes and we create some unecessary interim objects (grp, cnts). Let's try a different way.
